@@ -13,7 +13,15 @@ class ProductoCard extends StatelessWidget {
         decoration: _cardBorders(),
         child: Stack(
           alignment: Alignment.bottomLeft,
-          children: [_BackgroundImage(), _ProductDetails()],
+          children: [
+            _BackgroundImage(),
+            _ProductDetails(),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: _PriceTag(),
+            ),
+          ],
         ),
       ),
     );
@@ -66,7 +74,7 @@ class _ProductDetails extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-             Text(
+            Text(
               "ID del disco duro",
               style: TextStyle(
                 fontSize: 15,
@@ -87,6 +95,37 @@ class _ProductDetails extends StatelessWidget {
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(25),
         topRight: Radius.circular(25),
+      ),
+    );
+  }
+}
+
+class _PriceTag extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 100,
+      height: 70,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.indigo,
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(25),
+          bottomLeft: Radius.circular(25),
+        ),
+      ),
+      child: const FittedBox(
+        fit: BoxFit.contain,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            '103.99€',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+        ),
       ),
     );
   }
