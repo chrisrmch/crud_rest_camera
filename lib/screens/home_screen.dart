@@ -9,6 +9,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productsService = Provider.of<ProductsService>(context);
+
     if (productsService.isLoading) return const LoadingScreen();
     return Scaffold(
       appBar: AppBar(
@@ -20,6 +21,7 @@ class HomeScreen extends StatelessWidget {
       body: ListView.builder(
         itemCount: productsService.products.length,
         itemBuilder: (BuildContext context, int index) => ProductoCard(
+          productsService: productsService,
           product: productsService.products[index],
         ),
       ),

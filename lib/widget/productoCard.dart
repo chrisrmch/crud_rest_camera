@@ -1,9 +1,13 @@
+import 'package:crud_rest_camara/services/products_service.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_rest_camara/models/product.dart';
+import 'package:provider/provider.dart';
 
 class ProductoCard extends StatelessWidget {
+  final ProductsService productsService;
   final Product product;
-  const ProductoCard({super.key, required this.product});
+  const ProductoCard(
+      {super.key, required this.product, required this.productsService});
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +15,8 @@ class ProductoCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GestureDetector(
         onTap: () {
+          productsService.selectedProduct = product.copy();
+          print(productsService.selectedProduct.toString());
           Navigator.pushNamed(context, 'productScreen');
         },
         child: Container(
@@ -97,7 +103,7 @@ class _BackgroundImage extends StatelessWidget {
       width: double.infinity,
       height: 400,
       child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(25)),
+        borderRadius: const BorderRadius.all(Radius.circular(25)),
         child: url == null
             ? const Image(
                 image: AssetImage('lib/assets/no-image.png'),
