@@ -1,3 +1,4 @@
+import 'package:crud_rest_camara/screens/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/screens.dart';
 
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       initialRoute: 'home',
       routes: {
         'home': (_) => const HomeScreen(),
+        'productScreen': (_) => const ProductScreen(),
       },
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Colors.grey[300],
