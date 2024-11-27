@@ -1,0 +1,1 @@
+export 'package:crud_rest_camara/services/products_service.dart';
