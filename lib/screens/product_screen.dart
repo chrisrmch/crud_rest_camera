@@ -16,15 +16,15 @@ class ProductScreen extends StatelessWidget {
 
     return ChangeNotifierProvider(
       create: (_) => ProductFormProvider(productsService.selectedProduct),
-      child: _ProductScreenBody(productsService: productsService),
+      child: _ProductScreenBody(productService: productsService),
     );
   }
 }
 
 class _ProductScreenBody extends StatelessWidget {
-  final ProductsService productsService;
+  final ProductsService productService;
 
-  const _ProductScreenBody({required this.productsService});
+  const _ProductScreenBody({required this.productService});
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +35,14 @@ class _ProductScreenBody extends StatelessWidget {
             Stack(
               children: [
                 ProductImage(
-                  url: productsService.selectedProduct.picture,
+                  url: productService.selectedProduct.picture,
                 ),
                 _volverAtrasIcon(context),
                 _cameraIcon(),
               ],
             ),
             ProductForm(
-              product: productsService.selectedProduct,
+              product: productService.selectedProduct,
             )
           ],
         ),
@@ -98,6 +98,8 @@ class ProductForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productForm = Provider.of<ProductFormProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
@@ -131,7 +133,8 @@ class ProductForm extends StatelessWidget {
                   }
                 },
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}')),
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'^(\d+)?\.?\d{0,2}')),
                 ],
                 keyboardType: TextInputType.number,
                 decoration: InputDecorations.authInputDecoration(
@@ -141,11 +144,10 @@ class ProductForm extends StatelessWidget {
               ),
               const SizedBox(height: 30),
               SwitchListTile.adaptive(
-                
                 value: true,
                 title: const Text('Disponible'),
                 activeColor: Colors.indigo,
-                onChanged: (value) {},
+                onChanged: (value) => productForm.updateAvailability(value),
               )
             ],
           ),
