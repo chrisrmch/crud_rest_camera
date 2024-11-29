@@ -4,6 +4,8 @@ import 'package:crud_rest_camara/widget/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:crud_rest_camara/models/product.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   @override
@@ -26,7 +28,14 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          productsService.selectedProduct = Product(
+            available: false,
+            price: 0,
+            name: '',
+          );
+          Navigator.pushNamed(context, 'productScreen');
+        },
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50.0),

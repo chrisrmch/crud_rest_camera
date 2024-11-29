@@ -28,6 +28,8 @@ class _ProductScreenBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productForm = Provider.of<ProductFormProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -35,7 +37,7 @@ class _ProductScreenBody extends StatelessWidget {
             Stack(
               children: [
                 ProductImage(
-                  url: productService.selectedProduct.picture,
+                  url: productForm.product.picture,
                 ),
                 _volverAtrasIcon(context),
                 _cameraIcon(),
@@ -48,7 +50,10 @@ class _ProductScreenBody extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () async {
+          if (!productForm.isValidForm()) return;
+          await productService.saveOrUpdateProduct(productForm.product);
+        },
         child: const Icon(
           Icons.save_outlined,
           color: Colors.white,
@@ -106,6 +111,8 @@ class ProductForm extends StatelessWidget {
         width: double.infinity,
         decoration: _productFormDecoration(),
         child: Form(
+          key: productForm.formKey,
+          autovalidateMode: AutovalidateMode.onUnfocus,
           child: Column(
             children: [
               const SizedBox(height: 10),
@@ -126,7 +133,7 @@ class ProductForm extends StatelessWidget {
               TextFormField(
                 initialValue: '${product.price}',
                 onChanged: (value) {
-                  if (double.parse(value) == null) {
+                  if (value.isEmpty) {
                     product.price = 0;
                   } else {
                     product.price = double.parse(value);
@@ -140,11 +147,11 @@ class ProductForm extends StatelessWidget {
                 decoration: InputDecorations.authInputDecoration(
                   hintText: '150€',
                   labelText: 'Precio',
-                ),
+                ),  
               ),
               const SizedBox(height: 30),
               SwitchListTile.adaptive(
-                value: true,
+                value: product.available,
                 title: const Text('Disponible'),
                 activeColor: Colors.indigo,
                 onChanged: (value) => productForm.updateAvailability(value),
@@ -158,16 +165,17 @@ class ProductForm extends StatelessWidget {
 
   BoxDecoration _productFormDecoration() {
     return BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(25),
-          bottomRight: Radius.circular(25),
-        ),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              offset: const Offset(0, 5),
-              blurRadius: 5)
-        ]);
+      color: Colors.white,
+      borderRadius: const BorderRadius.only(
+        bottomLeft: Radius.circular(25),
+        bottomRight: Radius.circular(25),
+      ),
+      boxShadow: [
+        BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            offset: const Offset(0, 5),
+            blurRadius: 5)
+      ],
+    );
   }
 }
