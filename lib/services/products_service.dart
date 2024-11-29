@@ -54,10 +54,10 @@ class ProductsService extends ChangeNotifier {
       await createProduct(product);
     } else {
       await updateProduct(product);
+      final index = products.indexWhere((element) => element.id == product.id);
+      products[index] = product;
     }
 
-    final index = products.indexWhere((element) => element.id == product.id);
-    products[index] = product;
     isSaving = false;
     notifyListeners();
   }
@@ -65,10 +65,15 @@ class ProductsService extends ChangeNotifier {
   Future<String> createProduct(Product product) async {
     final url = Uri.https(_baseUrl, 'products.json');
     final resp = await http.post(url, body: product.toJson());
-    final decodedData = resp.body;
+    final decodedData = json.decode(resp.body);
 
-    print(decodedData);
+    product.id = decodedData["name"];
 
-    return '';
+    print("ID : " + product.id!);
+
+
+    products.add(product);
+
+    return product.id!;
   }
 }
