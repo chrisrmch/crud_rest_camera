@@ -1,3 +1,4 @@
+import 'package:crud_rest_camara/widget/get_image.dart';
 import 'package:flutter/material.dart';
 
 class ProductImage extends StatelessWidget {
@@ -14,8 +15,8 @@ class ProductImage extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.black,
           borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(45),
-            bottomRight: Radius.circular(45),
+            topLeft: Radius.circular(45),
+            topRight: Radius.circular(45),
           ),
           boxShadow: [
             BoxShadow(
@@ -31,16 +32,7 @@ class ProductImage extends StatelessWidget {
               topLeft: Radius.circular(45),
               topRight: Radius.circular(45),
             ),
-            child: url == null
-                ? const Image(
-                    image: AssetImage('lib/assets/no-image.png'),
-                    fit: BoxFit.cover,
-                  )
-                : FadeInImage(
-                    placeholder: const AssetImage('lib/assets/jar-loading.gif'),
-                    image: NetworkImage(url!),
-                    fit: BoxFit.cover,
-                  ),
+            child: GetImage(image: url),
           ),
         ),
       ),

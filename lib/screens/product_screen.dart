@@ -1,11 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:crud_rest_camara/models/product.dart';
 import 'package:crud_rest_camara/providers/product_form_provider.dart';
 import 'package:crud_rest_camara/services/products_service.dart';
 import 'package:crud_rest_camara/ui/input_decorations.dart';
-import 'package:flutter/material.dart';
 
 import 'package:crud_rest_camara/widget/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProductScreen extends StatelessWidget {
@@ -40,7 +41,29 @@ class _ProductScreenBody extends StatelessWidget {
                   url: productForm.product.picture,
                 ),
                 _volverAtrasIcon(context),
-                _cameraIcon(),
+                _cameraIcon(productForm),
+                Positioned(
+                  top: 60,
+                  right: 80,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.photo_library_outlined,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                    onPressed: productService.isSaving
+                        ? null
+                        : () async {
+                            await _processImage('gallery');
+                            if (productForm.isValidForm()) {
+                              final String? imageUrl =
+                                  await productService.uploadImage();
+                              if (imageUrl != null)
+                                productForm.product.picture = imageUrl;
+                            }
+                          },
+                  ),
+                )
               ],
             ),
             ProductForm(
@@ -54,21 +77,31 @@ class _ProductScreenBody extends StatelessWidget {
           if (!productForm.isValidForm()) return;
           await productService.saveOrUpdateProduct(productForm.product);
         },
-        child: const Icon(
-          Icons.save_outlined,
-          color: Colors.white,
-        ),
+        child: productService.isSaving
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Icon(
+                Icons.save_outlined,
+                color: Colors.white,
+              ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 
-  Positioned _cameraIcon() {
+  Positioned _cameraIcon(ProductFormProvider productForm) {
     return Positioned(
       top: 60,
       right: 20,
       child: IconButton(
-        onPressed: () {},
+        onPressed: productService.isSaving
+            ? null
+            : () async {
+                await _processImage("camera");
+                if (productForm.isValidForm()) {
+                  final String? imageUrl = await productService.uploadImage();
+                  if (imageUrl != null) productForm.product.picture = imageUrl;
+                }
+              },
         icon: const Icon(
           Icons.camera_alt_outlined,
           color: Colors.white,
@@ -93,6 +126,30 @@ class _ProductScreenBody extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _processImage(String source) async {
+    final picker = ImagePicker();
+    late XFile? pickedFile;
+
+    if (source == "camera") {
+      pickedFile = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 100,
+      );
+    } else {
+      pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 100,
+      );
+    }
+
+    if (pickedFile == null) {
+      print("no se ha seleccionado nada");
+    } else {
+      print("tenemos imagen: ${pickedFile.path}");
+      productService.updateSelectedProductImage(pickedFile.path);
+    }
   }
 }
 
@@ -123,13 +180,14 @@ class ProductForm extends StatelessWidget {
                   if (value == null || value.isEmpty) {
                     return 'el nombre es obligatorio';
                   }
+                  return null;
                 },
                 decoration: InputDecorations.authInputDecoration(
                   hintText: 'Nombre del producto',
                   labelText: 'Nombre',
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               TextFormField(
                 initialValue: '${product.price}',
                 onChanged: (value) {
@@ -147,9 +205,38 @@ class ProductForm extends StatelessWidget {
                 decoration: InputDecorations.authInputDecoration(
                   hintText: '150€',
                   labelText: 'Precio',
-                ),  
+                ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(
+                height: 20,
+              ),
+              TextFormField(
+                controller: productForm.fechaRegistroController,
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1980),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    productForm.fechaRegistro = pickedDate;
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor introduce la fecha de registro';
+                  }
+                  return null;
+                },
+                decoration: InputDecorations.authInputDecoration(
+                  hintText: 'dd/mm/aaaa',
+                  labelText: 'Fecha de registro',
+                  prefixIcon: Icons.calendar_today,
+                ),
+              ),
+              const SizedBox(height: 20),
               SwitchListTile.adaptive(
                 value: product.available,
                 title: const Text('Disponible'),

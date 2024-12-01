@@ -1,7 +1,7 @@
 import 'package:crud_rest_camara/services/products_service.dart';
+import 'package:crud_rest_camara/widget/get_image.dart';
 import 'package:flutter/material.dart';
 import 'package:crud_rest_camara/models/product.dart';
-import 'package:provider/provider.dart';
 
 class ProductoCard extends StatelessWidget {
   final ProductsService productsService;
@@ -95,7 +95,7 @@ class _NotAvailable extends StatelessWidget {
 class _BackgroundImage extends StatelessWidget {
   final String? url;
 
-  const _BackgroundImage({super.key, this.url});
+  const _BackgroundImage({this.url});
 
   @override
   Widget build(BuildContext context) {
@@ -103,18 +103,8 @@ class _BackgroundImage extends StatelessWidget {
       width: double.infinity,
       height: 400,
       child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(25)),
-        child: url == null
-            ? const Image(
-                image: AssetImage('lib/assets/no-image.png'),
-                fit: BoxFit.cover,
-              )
-            : FadeInImage(
-                placeholder: const AssetImage('lib/assets/jar-loading.gif'),
-                image: NetworkImage(url!),
-                fit: BoxFit.cover,
-              ),
-      ),
+          borderRadius: const BorderRadius.all(Radius.circular(25)),
+          child: GetImage(image: url)),
     );
   }
 }

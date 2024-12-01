@@ -22,9 +22,29 @@ class HomeScreen extends StatelessWidget {
       ),
       body: ListView.builder(
         itemCount: productsService.products.length,
-        itemBuilder: (BuildContext context, int index) => ProductoCard(
-          productsService: productsService,
-          product: productsService.products[index],
+        itemBuilder: (BuildContext context, int index) => Dismissible(
+          key: Key(productsService.products[index].id!),
+          direction: DismissDirection.endToStart,
+          onDismissed: (direction) async {
+            final confirmarEliminacion = await showDialog<bool>(
+              context: context,
+              builder: (context) => _confirmarEliminarProducto(context),
+            );
+
+            if (confirmarEliminacion == true) {
+              productsService.deleteProduct(productsService.products[index]);
+            }
+          },
+          background: Container(
+            color: Colors.red,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            alignment: Alignment.centerRight,
+            child: const Icon(Icons.delete, color: Colors.white),
+          ),
+          child: ProductoCard(
+            productsService: productsService,
+            product: productsService.products[index],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -42,6 +62,24 @@ class HomeScreen extends StatelessWidget {
         ),
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  AlertDialog _confirmarEliminarProducto(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Confirmar eliminación'),
+      content:
+          const Text('¿Estás seguro de que quieres eliminar este producto?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancelar'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Eliminar'),
+        ),
+      ],
     );
   }
 }

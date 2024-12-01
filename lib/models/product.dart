@@ -6,6 +6,7 @@ class Product {
   String? picture;
   double price;
   String? id;
+  DateTime? fechaRegistro;
 
   Product({
     required this.available,
@@ -13,6 +14,7 @@ class Product {
     this.picture,
     required this.price,
     this.id,
+    this.fechaRegistro,
   });
 
   factory Product.fromJson(String str) => Product.fromMap(json.decode(str));
@@ -24,6 +26,7 @@ class Product {
         name: json["name"],
         picture: json["picture"],
         price: json["price"]?.toDouble(),
+        fechaRegistro: DateTime.parse(json["fechaRegistro"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -31,14 +34,16 @@ class Product {
         "name": name,
         "picture": picture,
         "price": price,
+        "fechaRegistro": fechaRegistro?.toIso8601String(),
       };
 
 // Deep copy para evitar la copia por referencia
   Product copy() => Product(
-        available: this.available,
-        name: this.name,
-        picture: this.picture,
-        price: this.price,
-        id: this.id,
+        available: available,
+        name: name,
+        picture: picture,
+        price: price,
+        id: id,
+        fechaRegistro: fechaRegistro,
       );
 }

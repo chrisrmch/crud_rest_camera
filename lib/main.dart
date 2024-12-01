@@ -1,4 +1,3 @@
-import 'package:crud_rest_camara/screens/product_screen.dart';
 import 'package:crud_rest_camara/services/products_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

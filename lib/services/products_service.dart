@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:crud_rest_camara/models/product.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class ProductsService extends ChangeNotifier {
   bool isLoading = true;
   bool isSaving = false;
   late Product selectedProduct;
+  File? newPictureFile;
 
   ProductsService() {
     loadProducts();
@@ -69,11 +71,54 @@ class ProductsService extends ChangeNotifier {
 
     product.id = decodedData["name"];
 
-    print("ID : " + product.id!);
-
-
     products.add(product);
 
     return product.id!;
+  }
+
+  void updateSelectedProductImage(String path) {
+    selectedProduct.picture = path;
+
+    newPictureFile = File.fromUri(Uri(path: path));
+
+    notifyListeners();
+  }
+
+  Future<String?> uploadImage() async {
+    if (newPictureFile == null) return null;
+
+    isSaving = true;
+    notifyListeners();
+
+    final url = Uri.parse(
+        "https://api.cloudinary.com/v1_1/djahunlcm/image/upload?upload_preset=if1uchdu");
+
+    final imageUploadRequest = http.MultipartRequest('POST', url);
+
+    final file =
+        await http.MultipartFile.fromPath('file', newPictureFile!.path);
+
+    imageUploadRequest.files.add(file);
+
+    final streamResponse = await imageUploadRequest.send();
+
+    final resp = await http.Response.fromStream(streamResponse);
+
+    if (resp.statusCode != 200 && resp.statusCode != 201) {
+      print("Ha habido un error");
+      print(resp.body);
+      return null;
+    }
+
+    newPictureFile = null;
+    final decodedData = json.decode(resp.body);
+    return decodedData['secure_url'];
+  }
+
+  Future<void> deleteProduct(Product product) async {
+    final url = Uri.https(_baseUrl, 'products/${product.id}.json');
+    await http.delete(url);
+    products.removeWhere((element) => element.id == product.id);
+    notifyListeners();
   }
 }
