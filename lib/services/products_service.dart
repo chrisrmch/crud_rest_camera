@@ -45,6 +45,8 @@ class ProductsService extends ChangeNotifier {
 
     print(decodedData);
 
+    notifyListeners();
+
     return product.id!;
   }
 
